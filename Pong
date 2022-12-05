@@ -1,0 +1,180 @@
+#Michael Kraemer (solo)
+#Pong
+
+import turtle
+import random
+import time
+
+#Screen setup
+screen = turtle.Screen()
+screen.title("Pong")
+screen.bgcolor("White")
+screen.setup(width=1000,height=600)
+
+#Left paddle
+leftPaddle = turtle.Turtle()
+leftPaddle.speed(0)
+leftPaddle.shape("square")
+leftPaddle.shapesize(stretch_wid=6,stretch_len=2)
+leftPaddle.color("Black")
+leftPaddle.penup()
+leftPaddle.goto(-400,0)
+
+#Right paddle
+rightPaddle = turtle.Turtle()
+rightPaddle.speed(0)
+rightPaddle.shape("square")
+rightPaddle.shapesize(stretch_wid=6,stretch_len=2)
+rightPaddle.color("Black")
+rightPaddle.penup()
+rightPaddle.goto(400,0)
+
+#Center line
+line = turtle.Turtle()
+line.speed(0)
+line.color("green")
+line.goto(0,-1200)
+line.goto(0,1200)
+
+#Ball
+ball = turtle.Turtle()
+ball.speed(40)
+ball.shape("circle")
+ball.color("blue")
+ball.penup()
+ball.goto(0,0)
+ball.dx = 9
+ball.dy = -9
+
+#Player 1 score (left)
+player1Score = 0
+player1Text = turtle.Turtle()
+player1Text.color("red")
+player1Text.speed(0)
+player1Text.penup()
+player1Text.hideturtle()
+player1Text.goto(-400,200)
+player1Text.write("Player 1: 0", font=("Courier", 30, "normal"))
+
+#Player 2 score (right)
+player2Score = 0
+player2Text = turtle.Turtle()
+player2Text.color("red")
+player2Text.speed(0)
+player2Text.penup()
+player2Text.hideturtle()
+player2Text.goto(100,200)
+player2Text.write("Player 2: 0", font=("Courier", 30, "normal"))
+
+#Moves left paddle up
+def moveLeftPadUp():
+    y = leftPaddle.ycor()
+    y += 15
+    leftPaddle.sety(y)
+
+#Moves left paddle down
+def moveLeftPadDown():
+    y = leftPaddle.ycor()
+    y -= 15
+    leftPaddle.sety(y)
+
+#Moves right paddle up
+def moveRightPadUp():
+    y = rightPaddle.ycor()
+    y += 15
+    rightPaddle.sety(y)
+
+#Moves right paddle down
+def moveRightPadDown():
+    y = rightPaddle.ycor()
+    y -= 15
+    rightPaddle.sety(y)
+
+#Keyboard bindings
+screen.listen()
+screen.onkeypress(moveLeftPadUp,"e")
+screen.onkeypress(moveLeftPadDown,"x")
+screen.onkeypress(moveRightPadUp,"Up")
+screen.onkeypress(moveRightPadDown,"Down")
+
+#Game
+while player1Score < 7 and player2Score < 7:
+    #time.sleep(0.01)
+    screen.update()
+
+    ball.setx(ball.xcor() + ball.dx)
+    ball.sety(ball.ycor() + ball.dy)
+
+    #Checking if ball hits top or bottom
+    if ball.ycor() > 280 or ball.ycor() < -280:
+        #ball.sety(385)
+        ball.dy *= -1
+    
+    #Checking if ball hits right side (player 2 misses hit) and adding point
+    if ball.xcor() > 500:
+        player1Score += 1
+        ball.goto(0,0)
+        player1Text.clear()
+        player1Text.write("Player 1: {}".format(player1Score), font=("Courier", 30, "normal"))
+        ball.dx *= -1
+        ball.dy *= -1
+
+    #Checking if ball hits left side (player 1 misses hit) and adding point
+    if ball.xcor() < -500:
+        player2Score += 1
+        ball.goto(0,0)
+        player2Text.clear()
+        player2Text.write("Player 2: {}".format(player2Score), font=("Courier", 30, "normal"))
+        ball.dx *= -1
+        ball.dy *= -1
+
+    #Checking if player 2 hits the ball
+    if (ball.xcor() > 360 and ball.xcor() < 370) and (ball.ycor() < rightPaddle.ycor()+50 and ball.ycor() > rightPaddle.ycor()-50):
+        #ball.setx(660)
+        ball.dx*=-1
+
+    #Checking if player 1 hits the ball
+    if (ball.xcor() < -360 and ball.xcor() > -370) and (ball.ycor() < leftPaddle.ycor()+50 and ball.ycor() > leftPaddle.ycor()-50):
+        #ball.setx(-660)
+        ball.dx*=-1
+    
+    #Twist (Paddle gets smaller)
+    if player1Score == player2Score + 2:
+        leftPaddle.shapesize(stretch_len=2,stretch_wid=5)
+    elif player1Score == player2Score + 3:
+        leftPaddle.shapesize(stretch_len=2,stretch_wid=4)
+    elif player1Score == player2Score + 4:
+        leftPaddle.shapesize(stretch_len=2,stretch_wid=3)
+    elif (player1Score == player2Score) or (player1Score == player2Score + 1):
+        leftPaddle.shapesize(stretch_len=2,stretch_wid=6)
+
+    if player2Score == player1Score + 2:
+        rightPaddle.shapesize(stretch_len=2,stretch_wid=5)
+    elif player2Score == player1Score + 3:
+        rightPaddle.shapesize(stretch_len=2,stretch_wid=4)
+    elif player2Score == player1Score + 4:
+        rightPaddle.shapesize(stretch_len=2,stretch_wid=3)
+    elif (player2Score == player1Score) or (player2Score == player1Score + 1):
+        rightPaddle.shapesize(stretch_len=2,stretch_wid=6)
+    
+    
+    #Announcing who wins
+    if player1Score == 7:
+        winner = turtle.Turtle()
+        winner.color("Red")
+        winner.speed(0)
+        winner.penup()
+        winner.hideturtle()
+        winner.goto(0,0)
+        winner.write("Player 1 wins!", align="center", font=("Courier", 50, "bold"))
+    elif player2Score == 7:
+        winner = turtle.Turtle()
+        winner.color("Red")
+        winner.speed(0)
+        winner.penup()
+        winner.hideturtle()
+        winner.goto(0,0)
+        winner.write("Player 2 wins!", align="center", font=("Courier", 50, "bold"))
+
+
+turtle.done()
